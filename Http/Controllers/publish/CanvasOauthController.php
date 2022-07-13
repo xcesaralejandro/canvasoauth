@@ -22,4 +22,9 @@ class CanvasOauthController extends CanvasOauthControllerBase {
         // Any error that may arise during the oauth flow will be thrown here
     }
 
+    public function onRenewTokenError(\Exception $exception) : mixed {
+        parent::onRenewTokenError($exception); // you can skip this, only creates debug log
+        // Any errors that may arise during the renewal of a token for the user
+    } 
+
 }

@@ -1,12 +1,16 @@
 <?php
 namespace xcesaralejandro\canvasoauth\Classes;
 
+use App\Models\CanvasToken;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
+
 class CanvasOauth {
 
     const AUTH_RESPONSE_TYPE = 'code';
 
-    function __construct(){
-        $this->assertConfigSet();
+    public function __construct(){
+        $this->assertConfigWasSet();
     }
 
     public function getInitialAuthenticationUrl() : string {
@@ -26,25 +30,19 @@ class CanvasOauth {
         return "{$this->getCanvasUrl()}/login/oauth2/token";
     }
 
-    public function buildTokenRequestParams(string $code) : array {
-        $params = ["client_id" => $this->getClientId(), "client_secret" => $this->getClientSecret(),
-                   "code" => $code];
-        return $params;
-    }
-
-    private function getCanvasUrl() : ?string {
+    public function getCanvasUrl() : ?string {
         return config('canvasoauth.CANVAS_DOMAIN_URL');
     }
 
-    private function getClientId() : null | string | int {
+    public function getClientId() : null | string | int {
         return config('canvasoauth.CANVAS_CLIENT_ID');
     }
 
-    private function getClientSecret() : ?string {
+    public function getClientSecret() : ?string {
         return config('canvasoauth.CANVAS_CLIENT_SECRET');
     }
 
-    private function assertConfigSet() : void {
+    private function assertConfigWasSet() : void {
         $config_keys = ['CANVAS_DOMAIN_URL', 'CANVAS_CLIENT_ID', 'CANVAS_CLIENT_SECRET'];
         foreach($config_keys as $key){
             $config_value =  config("canvasoauth.{$key}");

@@ -26,6 +26,11 @@ class CanvasOauthController {
         throw new \Exception($exception);
     }
 
+    public function onRenewTokenError(\Exception $exception) : mixed {
+        Log::error('[CanvasOauthController] [onRenewTokenError] Something went wrong trying to renew the user token', [$exception->getMessage()]);
+        throw new \Exception($exception);
+    }
+
     public function codeExchange(Request $request) : mixed {
         Log::debug('[CanvasOauthController] [codeExchange] Trying code exchange.', $request->all());
         try{
@@ -33,7 +38,11 @@ class CanvasOauthController {
                 return $this->onRejectedPermission($request);
             }
             $client = new Client();
-            $options = ['form_params' => CanvasOauth::buildTokenRequestParams($request->code)];
+            $params = [
+                "client_id" => CanvasOauth::getClientId(), 
+                "client_secret" => CanvasOauth::getClientSecret(),
+                "code" => $request->code];
+            $options = ['form_params' => $params];
             $res = $client->request('POST', CanvasOauth::getTokenUrl(), $options);
             $payload = json_decode($res->getBody()->getContents());
             Log::debug('[CanvasOauthController] [codeExchange] Canvas response for code exchange.', [json_encode($payload)]);
