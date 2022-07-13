@@ -1,5 +1,5 @@
 {
-    "name": "xcesaralejandro/canvas_oauth_for_laravel",
+    "name": "xcesaralejandro/canvasoauth",
     "description": "This package provides a simple integration for oauth between canvas and laravel.",
     "license": "MIT",
     "authors": [
@@ -10,14 +10,12 @@
     ],
     "require": {
         "php": "^8.0",
-        "guzzlehttp/guzzle": "^7.0.1",
-        "firebase/php-jwt": "^5.2",
-        "ramsey/uuid": "^4.1"
+        "guzzlehttp/guzzle": "^7.0.1"
     },
     "autoload": {
         "psr-4" : {
-            "xcesaralejandro\\canvas_oauth_for_laravel\\" : "src/",
-            "xcesaralejandro\\canvas_oauth_for_laravel\\Http\\" : "Http/"
+            "xcesaralejandro\\canvasoauth\\" : "src/",
+            "xcesaralejandro\\canvasoauth\\Http\\" : "Http/"
         }
     },
     "require-dev": {
@@ -26,8 +24,11 @@
     "extra": {
         "laravel" : {
             "providers" : [
-                "xcesaralejandro\\canvas_oauth_for_laravel\\Providers\\CanvasOauthServiceProvider"
-            ]
+                "xcesaralejandro\\canvasoauth\\Providers\\CanvasOauthServiceProvider"
+            ],
+            "aliases" : {
+                "CanvasOauth" : "xcesaralejandro\\canvasoauth\\Facades\\CanvasOauth"
+            }
         }
     }
 }
