@@ -1,7 +1,7 @@
-<?php 
+<?php
 
+use App\Http\Controllers\CanvasOauthController;
 use Illuminate\Support\Facades\Route;
-use xcesaralejandro\canvasoauth\Http\Controllers\CanvasOauthController;
 
 
 Route::group(['prefix' => 'canvas'], function(){

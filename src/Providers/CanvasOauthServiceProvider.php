@@ -17,6 +17,9 @@ class CanvasOauthServiceProvider extends ServiceProvider {
         $this->publishes([
             $this->packageBasePath('src/Models/publish') => base_path('app/Models')
         ], 'xcesaralejandro-canvasoauth-models');
+        $this->publishes([
+            $this->packageBasePath('Http/Controllers/publish') => base_path('app/Http/Controllers')
+        ], 'xcesaralejandro-canvasoauth-controller');
     }
 
     public function register(){

@@ -11,8 +11,6 @@ use xcesaralejandro\canvasoauth\Facades\CanvasOauth;
 
 class CanvasOauthController {
 
-    const AUTH_RESPONSE_TYPE = 'code';
-
     public function onFinish(AuthenticatedUser $user) : mixed {
         Log::debug('[CanvasOauthController] [onFinish] Token was stored successfully.', [json_encode($user)]);
         return null;
@@ -20,7 +18,6 @@ class CanvasOauthController {
 
     public function onRejectedPermission(Request $request) : mixed {
         Log::debug('[CanvasOauthController] [onRejectedPermission] Permission rejected.', $request->all());
-        echo 'Permission rejected.';
         return null;
     }
 
