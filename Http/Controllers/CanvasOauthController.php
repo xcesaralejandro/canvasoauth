@@ -5,12 +5,18 @@ use App\Models\CanvasToken;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use xcesaralejandro\canvasoauth\DataStructures\AuthenticatedUser;
+use xcesaralejandro\canvasoauth\DataStructures\CanvasUser;
 use xcesaralejandro\canvasoauth\Facades\CanvasOauth;
 
 class CanvasOauthController {
 
     const AUTH_RESPONSE_TYPE = 'code';
 
+    public function onFinish(AuthenticatedUser $user) : mixed {
+        Log::debug('[CanvasOauthController] [onFinish] Token was stored successfully.', [json_encode($user)]);
+        return null;
+    }
 
     public function onRejectedPermission(Request $request) : mixed {
         Log::debug('[CanvasOauthController] [onRejectedPermission] Permission rejected.', $request->all());
@@ -23,7 +29,7 @@ class CanvasOauthController {
         throw new \Exception($exception);
     }
 
-    public function codeExchange(Request $request){
+    public function codeExchange(Request $request) : mixed {
         Log::debug('[CanvasOauthController] [codeExchange] Trying code exchange.', $request->all());
         try{
             if($this->permissionWasRejected($request)){
@@ -35,9 +41,29 @@ class CanvasOauthController {
             $payload = json_decode($res->getBody()->getContents());
             Log::debug('[CanvasOauthController] [codeExchange] Canvas response for code exchange.', [json_encode($payload)]);
             $this->saveToken($payload);
+            $user = $this->getAuthenticatedUser($payload);
+            return $this->onFinish($user);
         }catch(\Exception $e){
             return $this->onError($e);
         }
+    }
+
+    private function getAuthenticatedUser(object $payload) : AuthenticatedUser {
+        Log::debug('[CanvasOauthController] [getAuthenticatedUser] Filling authenticated user.');
+        $authenticated = new AuthenticatedUser();
+        $authenticated->standard->id = $payload->user->id;
+        $authenticated->standard->name = $payload->user->name;
+        $authenticated->standard->global_id = $payload->user->global_id;
+        $authenticated->standard->effective_locale = $payload->user->effective_locale ?? null;
+        if(isset($payload->real_user)){
+            $authenticated->supplanted_by = new CanvasUser();
+            $authenticated->supplanted_by->id = $payload->real_user->id;
+            $authenticated->supplanted_by->name = $payload->real_user->name;
+            $authenticated->supplanted_by->global_id = $payload->real_user->global_id;
+            $authenticated->supplanted_by->effective_locale = $payload->real_user->effective_locale ?? null;
+        }
+        Log::debug('[CanvasOauthController] [getAuthenticatedUser] User fields was filled.');
+        return $authenticated;
     }
 
     private function saveToken(object $payload) : void {
