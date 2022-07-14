@@ -49,7 +49,8 @@ class CanvasToken extends Model
                 'redirect_uri' => route('canvasoauth.code_exchange'),
                 'refresh_token' => $this->refresh_token
             ];
-            $res = $client->request('POST', $url, ['form_params' => $params]);
+            $verify_https = config('canvasoauth.VERIFY_SELF_SIGNED_HTTPS');
+            $res = $client->request('POST', $url, ['form_params' => $params, 'verify' => $verify_https]);
             if($res->getStatusCode() == 200){
                 $payload = json_decode($res->getBody()->getContents());
                 $this->access_token = $payload->access_token;
@@ -58,7 +59,7 @@ class CanvasToken extends Model
                 $this->update();
                 Log::debug('[CanvasToken] [renewToken] Token renewed.');
             }else{
-                throw new \Exception('Error trying get new token. The response status is not 200.');
+                throw new \Exception('Error trying get new token. The response status from canvas is not 200.');
             }
         }catch(\Exception $e){
             return (new CanvasOauthController())->onRenewTokenError($e);

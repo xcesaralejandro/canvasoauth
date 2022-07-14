@@ -42,7 +42,8 @@ class CanvasOauthController {
                 "client_id" => CanvasOauth::getClientId(), 
                 "client_secret" => CanvasOauth::getClientSecret(),
                 "code" => $request->code];
-            $options = ['form_params' => $params];
+            $verify_https = config('canvasoauth.VERIFY_SELF_SIGNED_HTTPS');
+            $options = ['form_params' => $params, 'verify' => $verify_https];
             $res = $client->request('POST', CanvasOauth::getTokenUrl(), $options);
             $payload = json_decode($res->getBody()->getContents());
             Log::debug('[CanvasOauthController] [codeExchange] Canvas response for code exchange.', [json_encode($payload)]);
