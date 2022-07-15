@@ -13,12 +13,12 @@ class CanvasOauthController {
 
     public function onFinish(AuthenticatedUser $user) : mixed {
         Log::debug('[CanvasOauthController] [onFinish] Token was stored successfully.', [json_encode($user)]);
-        return null;
+        return 'onFinish() method.';
     }
 
     public function onRejectedPermission(Request $request) : mixed {
         Log::debug('[CanvasOauthController] [onRejectedPermission] Permission rejected.', $request->all());
-        return null;
+        return 'onRejectedPermission() method.';
     }
 
     public function onError(\Exception $exception) : mixed {
