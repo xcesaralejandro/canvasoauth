@@ -33,7 +33,7 @@ Once the providers have been published, you will have a new file called ````canv
 
 The variables to fill in the configuration are the credentials obtained when adding a new API developer key in canvas. While it is generating the credentials, canvas will ask you for your redirection point, use the following for all fields where you need to put a URL:
 
-````https://YOUR_DOMAIN_HERE/canvas/verify_code````
+````https://YOUR_DOMAIN_HERE/canvas/code_exchange````
 
 
 Going back to the configuration, at this point it may be a bit obvious what goes into each section, but I'll comment on them anyway.
