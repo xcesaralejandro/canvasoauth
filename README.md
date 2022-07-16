@@ -72,22 +72,22 @@ To control the flow, use the controller ````App\Http\Controllers\CanvasOauthCont
 
 ````
     public function onFinish(AuthenticatedUser $user) : mixed {
-        parent::onFinish($user); // you can skip this, only creates debug log :)
+        return parent::onFinish($user); // you can skip this, only creates debug log :)
         // At this point the oauth flow has finished successfully and the user has granted permissions.
     }
 
     public function onRejectedPermission(Request $request) : mixed {
-        parent::onRejectedPermission($request); // you can skip this, only creates debug log :)
+        return parent::onRejectedPermission($request); // you can skip this, only creates debug log :)
         // At this point the user has canceled the grant of permissions.
     }
 
     public function onError(\Exception $exception) : mixed {
-        parent::onError($exception); // you can skip this, only creates debug log
+        return parent::onError($exception); // you can skip this, only creates debug log
         // Any error that may arise during the oauth flow will be thrown here
     }
 
     public function onRenewTokenError(\Exception $exception) : mixed {
-        parent::onRenewTokenError($exception); // you can skip this, only creates debug log
+        return parent::onRenewTokenError($exception); // you can skip this, only creates debug log
         // Any errors that may arise during the renewal of a token for the user
     } 
 ````
