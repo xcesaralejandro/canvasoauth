@@ -71,7 +71,7 @@ You can put the URL inside a link, automatic redirection or wherever you want, d
 To control the flow, use the controller ````App\Http\Controllers\CanvasOauthController.php````
 
 ````
-    public function onFinish(AuthenticatedUser $user) : mixed {
+    public function onFinish(AuthenticatedUser $user, Request $request) : mixed {
         return parent::onFinish($user); // you can skip this, only creates debug log :)
         // At this point the oauth flow has finished successfully and the user has granted permissions.
     }
