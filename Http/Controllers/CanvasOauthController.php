@@ -12,7 +12,7 @@ use xcesaralejandro\canvasoauth\Facades\CanvasOauth;
 class CanvasOauthController {
 
     public function onFinish(AuthenticatedUser $user, Request $request) : mixed {
-        Log::debug('[CanvasOauthController] [onFinish] Token was stored successfully.', [json_encode($user)]);
+        Log::debug('[CanvasOauthController] [onFinish] Token was stored successfully.', [json_encode($user), $request->all()]);
         return 'onFinish() method.';
     }
 
@@ -26,8 +26,9 @@ class CanvasOauthController {
         throw new \Exception($exception);
     }
 
-    public function onRenewTokenError(\Exception $exception) : mixed {
-        Log::error('[CanvasOauthController] [onRenewTokenError] Something went wrong trying to renew the user token', [$exception->getMessage()]);
+    public function onRenewTokenError(\Exception $exception, int $canvas_token_id) : mixed {
+        Log::error('[CanvasOauthController] [onRenewTokenError] Something went wrong trying to renew the user token', 
+        ["canvas_token_id" => $canvas_token_id, "error" => $exception->getMessage()]);
         throw new \Exception($exception);
     }
 

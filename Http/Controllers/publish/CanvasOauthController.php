@@ -7,8 +7,8 @@ use Illuminate\Http\Request;
 
 class CanvasOauthController extends CanvasOauthControllerBase {
 
-    public function onFinish(AuthenticatedUser $user) : mixed {
-        return parent::onFinish($user); // you can skip this, only creates debug log :)
+    public function onFinish(AuthenticatedUser $user, Request $request) : mixed {
+        return parent::onFinish($user, $request); // you can skip this, only creates debug log :)
         // At this point the oauth flow has finished successfully and the user has granted permissions.
     }
 
@@ -22,7 +22,7 @@ class CanvasOauthController extends CanvasOauthControllerBase {
         // Any error that may arise during the oauth flow will be thrown here
     }
 
-    public function onRenewTokenError(\Exception $exception) : mixed {
+    public function onRenewTokenError(\Exception $exception, int $canvas_token_id) : mixed {
         return parent::onRenewTokenError($exception); // you can skip this, only creates debug log
         // Any errors that may arise during the renewal of a token for the user
     } 

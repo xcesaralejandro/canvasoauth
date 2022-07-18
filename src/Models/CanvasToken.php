@@ -62,7 +62,7 @@ class CanvasToken extends Model
                 throw new \Exception('Error trying get new token. The response status from canvas is not 200.');
             }
         }catch(\Exception $e){
-            return (new CanvasOauthController())->onRenewTokenError($e);
+            return (new CanvasOauthController())->onRenewTokenError($e, $this->id);
         }
         return $this->access_token;
     }
