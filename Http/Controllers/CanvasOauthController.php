@@ -1,4 +1,4 @@
-<?php 
+<?php
 namespace xcesaralejandro\canvasoauth\Http\Controllers;
 
 use App\Models\CanvasToken;
@@ -11,7 +11,7 @@ use xcesaralejandro\canvasoauth\Facades\CanvasOauth;
 
 class CanvasOauthController {
 
-    public function onFinish(AuthenticatedUser $user) : mixed {
+    public function onFinish(AuthenticatedUser $user, Request $request) : mixed {
         Log::debug('[CanvasOauthController] [onFinish] Token was stored successfully.', [json_encode($user)]);
         return 'onFinish() method.';
     }
@@ -39,7 +39,7 @@ class CanvasOauthController {
             }
             $client = new Client();
             $params = [
-                "client_id" => CanvasOauth::getClientId(), 
+                "client_id" => CanvasOauth::getClientId(),
                 "client_secret" => CanvasOauth::getClientSecret(),
                 "code" => $request->code];
             $verify_https = config('canvasoauth.VERIFY_SELF_SIGNED_HTTPS');
@@ -49,7 +49,7 @@ class CanvasOauthController {
             Log::debug('[CanvasOauthController] [codeExchange] Canvas response for code exchange.', [json_encode($payload)]);
             $this->saveToken($payload);
             $user = $this->getAuthenticatedUser($payload);
-            return $this->onFinish($user);
+            return $this->onFinish($user, $request);
         }catch(\Exception $e){
             return $this->onError($e);
         }
@@ -76,10 +76,10 @@ class CanvasOauthController {
     private function saveToken(object $payload) : void {
         Log::debug('[CanvasOauthController] [saveToken] Triying save the token...');
         $fields = [
-            'user_global_id' => $payload->user->global_id, 
-            'access_token' => $payload->access_token, 
+            'user_global_id' => $payload->user->global_id,
+            'access_token' => $payload->access_token,
             'token_type' => $payload->token_type,
-            'refresh_token' => $payload->refresh_token, 
+            'refresh_token' => $payload->refresh_token,
             'expires_in' => $payload->expires_in];
         $conditions = ['user_id' => $payload->user->id];
         $result = CanvasToken::updateOrCreate($conditions, $fields);
