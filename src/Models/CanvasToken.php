@@ -18,7 +18,7 @@ class CanvasToken extends Model
     protected $fillable = ['user_id', 'user_global_id', 'access_token', 'token_type', 'refresh_token',
     'expires_in', 'expires_at', 'real_user_id', 'real_user_global_id'];
 
-    public function scopeExistsForUser(mixed $query, int $user_id) : string {
+    public function scopeExistsForUser(mixed $query, int $user_id) : bool {
         $instance = $query->where('user_id', $user_id)->first();
         return !empty($instance);
     }
