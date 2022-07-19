@@ -15,30 +15,33 @@ class CanvasToken extends Model
     protected $table = 'canvas_tokens';
     private $leeway = 120;
 
-    protected $fillable = ['user_id', 'user_global_id', 'access_token', 'token_type', 'refresh_token', 
+    protected $fillable = ['user_id', 'user_global_id', 'access_token', 'token_type', 'refresh_token',
     'expires_in', 'expires_at', 'real_user_id', 'real_user_global_id'];
-    
+
     public function scopeExistsForUser(mixed $query, int $user_id) : string {
         $instance = $query->where('user_id', $user_id)->first();
         return !empty($instance);
     }
 
-    public function scopeGetForUser(mixed $query, int $user_id) : string {
-        $instance = $query->where('user_id', $user_id)->firstOrFail();
-        if($instance->tokenIsExpired()){
-            $instance->renewToken();
+    public static function GetForUser(int $user_id) : ?string {
+        $instance = CanvasToken::where('user_id', $user_id)->first();
+        $access_token = $instance?->access_token; 
+        if(!empty($instance) && $instance->isExpired()){
+            $access_token = $instance->renew();
         }
-        return $instance->access_token;
+        return $access_token;
     }
 
-    public function tokenIsExpired() : bool {
+    public function isExpired() : bool {
+        return true;
         $expired_at =  $this->updated_at->timestamp + ($this->expires_in - $this->leeway);
         $now = Carbon::now()->timestamp;
         return $now >= $expired_at;
     }
 
-    public function renewToken() : string {
-        Log::debug('[CanvasToken] [renewToken] Trying renew token.');
+    public function renew() : ?string {
+        $renewed = null;
+        Log::debug('[CanvasToken] [renew] Trying renew token.');
         try{
             $url = CanvasOauth::getTokenUrl();
             $client = new Client();
@@ -57,13 +60,14 @@ class CanvasToken extends Model
                 $this->token_type = $payload->token_type;
                 $this->expires_in = $payload->expires_in;
                 $this->update();
-                Log::debug('[CanvasToken] [renewToken] Token renewed.');
+                $renewed = $payload->access_token;
+                Log::debug('[CanvasToken] [renew] Token renewed.');
             }else{
-                throw new \Exception('Error trying get new token. The response status from canvas is not 200.');
+                return throw new \Exception('Error trying get new token. The response status from canvas is not 200.');
             }
         }catch(\Exception $e){
-            return (new CanvasOauthController())->onRenewTokenError($e, $this->id);
+            $this->delete();
         }
-        return $this->access_token;
+        return $renewed;
     }
 }

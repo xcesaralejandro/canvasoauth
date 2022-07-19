@@ -85,11 +85,6 @@ To control the flow, use the controller ````App\Http\Controllers\CanvasOauthCont
         return parent::onError($exception); // you can skip this, only creates debug log
         // Any error that may arise during the oauth flow will be thrown here
     }
-
-    public function onRenewTokenError(\Exception $exception) : mixed {
-        return parent::onRenewTokenError($exception); // you can skip this, only creates debug log
-        // Any errors that may arise during the renewal of a token for the user
-    } 
 ````
 
 On the other hand, you can manage the tokens with the ````CanvasToken```` model and in the following way:

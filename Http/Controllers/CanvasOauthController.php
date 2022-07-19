@@ -26,12 +26,6 @@ class CanvasOauthController {
         throw new \Exception($exception);
     }
 
-    public function onRenewTokenError(\Exception $exception, int $canvas_token_id) : mixed {
-        Log::error('[CanvasOauthController] [onRenewTokenError] Something went wrong trying to renew the user token', 
-        ["canvas_token_id" => $canvas_token_id, "error" => $exception->getMessage()]);
-        throw new \Exception($exception);
-    }
-
     public function codeExchange(Request $request) : mixed {
         Log::debug('[CanvasOauthController] [codeExchange] Trying code exchange.', $request->all());
         try{
