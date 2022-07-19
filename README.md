@@ -95,8 +95,8 @@ Check if a token exists for the user
 CanvasToken::ExistsForUser(int $user_id) : bool
 ````
 
-Returns the token for a particular user, it is regenerated behind the scenes in case it is expired, so it will always return a valid token. If the consulted user does not have a token, a 404 will be thrown.
+Returns the token for a particular user, regenerates in the background in case the token is expired. If the consulted user does not have a token or an error has occurred while regenerating the token, it will return null.
 
 ```` 
-CanvasToken::GetForUser(int $user_id) : string
+CanvasToken::GetForUser(int $user_id) : ?string
 ````
