@@ -50,7 +50,7 @@ class CanvasOauthController {
         }
     }
 
-    private function getAuthenticatedUser(object $payload) : AuthenticatedUser {
+    protected function getAuthenticatedUser(object $payload) : AuthenticatedUser {
         Log::debug('[CanvasOauthController] [getAuthenticatedUser] Filling authenticated user.');
         $authenticated = new AuthenticatedUser();
         $authenticated->standard->id = $payload->user->id;
@@ -68,7 +68,7 @@ class CanvasOauthController {
         return $authenticated;
     }
 
-    private function saveToken(object $payload) : void {
+    protected function saveToken(object $payload) : void {
         Log::debug('[CanvasOauthController] [saveToken] Triying save the token...');
         $fields = [
             'user_global_id' => $payload->user->global_id,
@@ -81,7 +81,7 @@ class CanvasOauthController {
         Log::debug('[CanvasOauthController] [saveToken] Token was created or update.', [$result]);
     }
 
-    private function permissionWasRejected(Request $request){
+    protected function permissionWasRejected(Request $request){
         return !isset($request->code);
     }
 
