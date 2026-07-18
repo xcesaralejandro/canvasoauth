@@ -1,16 +1,16 @@
-<?php 
+<?php
+
 namespace xcesaralejandro\canvasoauth\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use xcesaralejandro\canvasoauth\Classes\CanvasOauth;
+use xcesaralejandro\canvasoauth\Console\Commands\CreateCanvasClient;
 
-class CanvasOauthServiceProvider extends ServiceProvider {
+class CanvasOauthServiceProvider extends ServiceProvider
+{
 
-    public function boot(){
+    public function boot()
+    {
         $this->loadRoutesFrom($this->packageBasePath('routes/web.php'));
-        $this->publishes([
-            $this->packageBasePath('config/canvasoauth.php') => base_path("config/canvasoauth.php")
-        ], 'xcesaralejandro-canvasoauth-config');
         $this->publishes([
             $this->packageBasePath('database/migrations') => database_path('migrations')
         ], 'xcesaralejandro-canvasoauth-migrations');
@@ -20,16 +20,15 @@ class CanvasOauthServiceProvider extends ServiceProvider {
         $this->publishes([
             $this->packageBasePath('Http/Controllers/publish') => base_path('app/Http/Controllers')
         ], 'xcesaralejandro-canvasoauth-controller');
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                CreateCanvasClient::class,
+            ]);
+        }
     }
 
-    public function register(){
-        $this->app->bind('canvas-oauth', function(){
-            return new CanvasOauth();
-        });
-        $this->mergeConfigFrom($this->packageBasePath('config/canvasoauth.php'), "canvasoauth");
-    }
-
-    protected function packageBasePath($uri){
-        return __DIR__."/../../$uri";
+    protected function packageBasePath($uri)
+    {
+        return __DIR__ . "/../../$uri";
     }
 }

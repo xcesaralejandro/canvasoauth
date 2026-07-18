@@ -2,12 +2,15 @@
 
 namespace xcesaralejandro\canvasoauth\DataStructures;
 
+use App\Models\CanvasUser;
 
-class AuthenticatedUser {
+class AuthenticatedUser
+{
     public CanvasUser $standard;
     public ?CanvasUser $supplanted_by;
-    
-    function __construct() {
+
+    function __construct()
+    {
         $this->standard = new CanvasUser();
         $this->supplanted_by = null;
     }
