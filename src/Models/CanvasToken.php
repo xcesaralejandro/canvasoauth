@@ -66,10 +66,10 @@ class CanvasToken extends Model
                     'token_type' => $payload->token_type,
                     'expires_in' => $payload->expires_in,
                 ]);
-                Log::debug('[CanvasToken] [renew] Token renovado exitosamente.');
+                Log::debug('[CanvasToken] [renew] Token refreshed successfully.');
                 return $payload->access_token;
             }
-            throw new \Exception("Canvas API respondió con estado: {$response->status()}");
+            throw new \Exception("Canvas API responded with status: {$response->status()}");
         } catch (\Exception $e) {
             $this->delete();
         }
