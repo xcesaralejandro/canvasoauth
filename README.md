@@ -33,6 +33,9 @@ composer require xcesaralejandro/canvasoauth
 php artisan vendor:publish --provider="xcesaralejandro\canvasoauth\Providers\CanvasOauthServiceProvider" --force
 ```
 
+The package resolves its models from your application (for example, `App\Models\CanvasClient`) instead of using the package models directly. The published models extend the package's base models, allowing the package to work with your application's models while giving you the flexibility to customize, extend, or override their behavior without modifying the package source code.
+
+
 ### 3. Run the migrations
 
 ```bash
