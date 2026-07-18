@@ -4,103 +4,45 @@ namespace xcesaralejandro\canvasoauth\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class CreateCanvasClient extends Command
+class CanvasClient extends Model
 {
-    protected $signature = 'canvas:create-client';
+    const AUTH_RESPONSE_TYPE = 'code';
 
-    protected $description = 'Register a new Canvas OAuth client';
+    protected $table = 'canvas_clients';
 
-    public function handle(): int
+    protected $fillable = ['code', 'url', 'client_id', 'client_secret'];
+
+    protected function code(): Attribute
     {
-        $this->newLine();
-        $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->info('              Canvas OAuth Client Setup');
-        $this->info('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        $this->newLine();
-
-        $this->line('<fg=gray>This command registers a Canvas OAuth client that can later be used to authenticate users or get access to the API resources.</>');
-
-        $code = trim($this->ask(
-            'Internal client code (used to identify this Canvas instance)'
-        ));
-
-        if ($code === '') {
-            $this->error('The client code is required.');
-            return self::FAILURE;
-        }
-
-        if (CanvasClient::query()->where('code', $code)->exists()) {
-            $this->error("A client with the code '{$code}' already exists.");
-            return self::FAILURE;
-        }
-
-        $url = rtrim(trim($this->ask(
-            'Canvas base URL (e.g. https://example.instructure.com)'
-        )), '/');
-
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            $this->error('Please enter a valid URL.');
-            return self::FAILURE;
-        }
-
-        $clientId = trim($this->ask('Canvas Client ID'));
-
-        if ($clientId === '') {
-            $this->error('The Client ID is required.');
-            return self::FAILURE;
-        }
-
-        $clientSecret = trim($this->secret('Canvas Client Secret'));
-
-        if ($clientSecret === '') {
-            $this->error('The Client Secret is required.');
-            return self::FAILURE;
-        }
-
-        $this->newLine();
-        $this->warn('Configuration Summary');
-
-        $this->table(
-            ['Property', 'Value'],
-            [
-                ['Code', mb_strtolower($code)],
-                ['Canvas URL', $url],
-                ['Client ID', $this->mask($clientId)],
-                ['Client Secret', str_repeat('•', 16)],
-            ]
+        return Attribute::make(
+            get: fn(?string $value) => $value ? mb_strtolower($value, 'UTF-8') : null,
+            set: fn(?string $value) => $value ? mb_strtolower($value, 'UTF-8') : null,
         );
-
-        $this->newLine();
-
-        if (! $this->confirm('Create this Canvas client?', true)) {
-            $this->warn('Operation cancelled.');
-            return self::SUCCESS;
-        }
-
-        $client = CanvasClient::query()->create([
-            'code' => $code,
-            'url' => $url,
-            'client_id' => $clientId,
-            'client_secret' => $clientSecret,
-        ]);
-
-        $this->newLine();
-        $this->info('✓ Canvas client created successfully.');
-        $this->line("<fg=green>Code:</> {$client->code}");
-        $this->line("<fg=green>Authorization URL:</>");
-        $this->line($client->getAuthorizationUrl());
-        $this->newLine();
-        return self::SUCCESS;
     }
 
-    private function mask(string $value): string
+    public function users()
     {
-        if (strlen($value) <= 8) {
-            return str_repeat('•', strlen($value));
-        }
+        return $this->hasMany(CanvasUser::class, 'canvas_client_id');
+    }
 
-        return substr($value, 0, 4)
-            . str_repeat('•', strlen($value) - 8)
-            . substr($value, -4);
+    public function getAuthUrl(): string
+    {
+        return "{$this->url}/login/oauth2/auth";
+    }
+
+    public function getTokenUrl(): string
+    {
+        return "{$this->url}/login/oauth2/token";
+    }
+
+    public function getAuthorizationUrl(): string
+    {
+        $query = http_build_query([
+            'client_id' => $this->client_id,
+            'response_type' => self::AUTH_RESPONSE_TYPE,
+            'redirect_uri' => route('canvas-oauth.callback'),
+            'state' => $this->code,
+        ]);
+        return "{$this->getAuthUrl()}?{$query}";
     }
 }
